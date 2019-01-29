@@ -5,14 +5,17 @@
   "author": "dprai <dam.plaza@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "@cerebral/react": "^4.0.4",
     "@types/react": "^16.7.20",
     "@types/react-dom": "^16.0.11",
+    "cerebral": "^5.0.4",
     "react": "^16.7.0",
     "react-dom": "^16.7.0"
   },
   "devDependencies": {
     "@babel/core": "^7.2.2",
     "babel": "^6.23.0",
+    "babel-plugin-cerebral": "^1.0.1",
     "typescript": "^3.2.4"
   }
 }
