@@ -16,6 +16,7 @@ const app = App(main, {
 if (module.hot) {
     module.hot.accept(function () {
         location.reload()
+    })
 }
 
 render(
