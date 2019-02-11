@@ -1,3 +1,6 @@
 export type State = {
-    title: string
+}
+
+export type Main = {
+    state: State
 }
