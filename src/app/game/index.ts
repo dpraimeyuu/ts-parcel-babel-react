@@ -1,19 +1,16 @@
 import { ModuleDefinition } from 'cerebral'
+
+import * as sequences from "./sequences/index";
 import { State } from './types'
-import game from "../game/index";
 
 const state: State = {
+    cards: [],
+    status: "NOT_STARTED"
 }
-
 
 const main: ModuleDefinition<State> = {
     state,
-    modules: {
-        game
-    },
-    providers: {
-
-    }
+    sequences
 }
 
 export default main
