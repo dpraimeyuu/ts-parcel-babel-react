@@ -6,7 +6,9 @@ export type Sequences = {
 
 export type State = {
     cards: Card[]
-    status: GameStatus
+    status: GameStatus,
+    currentTime: number,
+    points: number
 }
 
 export type GameStatus = "NOT_STARTED" | "PLAYING" | "FINISHED"
