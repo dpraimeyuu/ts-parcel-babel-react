@@ -2,6 +2,7 @@ import { set } from "cerebral/factories";
 import { IContext as Context, sequence } from "cerebral";
 import { state, props as p } from "../../app.cerebral";
 import { Card } from "../types";
+import { startTimeFlow } from "../providers/time/index";
 
 function shuffle<T extends {}>(a: T[]) {
     for (let i = a.length - 1; i > 0; i--) {
@@ -31,5 +32,6 @@ const startGame = ({ props, store }: Context<Props>) => {
 }
 export default sequence<Payload>([
     randomizeCards,
-    startGame
+    startGame,
+    startTimeFlow
 ])
