@@ -16,7 +16,7 @@ class CardsCount extends React.Component<CardsCountProps, { count?: number }> {
             How many cards do you want to play with?
             <span style={{ marginLeft: "1em" }}>
                 <input type="text" onChange={(e) => this.setState({ count: Number(e.target.value) })} />
-                <button style={{ marginLeft: "1em" }} disabled={!Boolean(this.state.count)} onClick={() => props.onChange({ numberOfCards: this.state.count as number })}>START</button>
+                <button style={{ marginLeft: "1em" }} disabled={!Boolean(this.state.count)} onClick={() => this.props.onChange({ numberOfCards: this.state.count as number })}>START</button>
             </span>
         </div>
     )
