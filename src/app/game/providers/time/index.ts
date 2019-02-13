@@ -1,14 +1,19 @@
+import { IContext } from "cerebral";
+
 export interface ITime {
     start(): void
     stop(): void
 }
 
-export const Time = (seq: any) => {
+export type TimeConfiguration = {
+    timeUpdated: string
+}
+export const Time = (configuration: TimeConfiguration) => {
     let timeStopper: number | undefined
 
-    return (context: any): ITime => ({
+    return (context: IContext): ITime => ({
         start() {
-            const sequence = context.app.getSequence(seq)
+            const sequence = context.app.getSequence(configuration.timeUpdated)
             if(sequence) {
                 timeStopper = setInterval(() => {
                     sequence()
