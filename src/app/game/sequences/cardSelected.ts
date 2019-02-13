@@ -1,23 +1,15 @@
-import { IContext as Context, sequence } from "cerebral";
+import { IContext as Context, sequence, Tag, IContext } from "cerebral";
 
-import { state, sequences } from "../../app.cerebral";
+import { state, props as p } from "../../app.cerebral";
 import { Card } from "../types";
+import { when, set } from "cerebral/factories";
 
 type Payload = { card: Card }
 
-const cardSelected = ({ props, store, get }: Context<Payload>) => {
+const processSelectedCards = ({ props, store, get }: Context<Payload>) => {
     const { card } = props
-    if(card.isSolved) return
+
     const cards: Card[] = get(state.game.cards)
-    if (cards.filter((c) => c.isSelected).length === 2) return
-    
-    if(!cards || cards.length === 0) throw new Error("Cards were not initialized!")
-
-    const c = cards.find(c => c === card)
-    if(!c) throw new Error("Card was not found among cards")
-    const idx = cards.indexOf(c)
-
-    store.set((state.game.cards)[idx].isSelected, true)
     
     const selectedCards = cards.filter((c) => c.isSelected)
     if(selectedCards.length === 2) {
@@ -42,4 +34,52 @@ const cardSelected = ({ props, store, get }: Context<Payload>) => {
 
 }
 
-export default sequence<Payload>(cardSelected)
+const areExactlyTwoSelected = (cardsTag: Card[]) => ({ resolve, path }: IContext) => {
+    const cards = resolve.value<Card[]>(cardsTag)
+    if(!cards) throw Error(`Cards are not existing under path: ${resolve.path(cardsTag as any as Tag<Card[]>)}`)
+
+    if (cards.filter((c) => c.isSelected).length === 2) return path.true()
+
+    return path.false()
+}
+
+const _findIndex = <T extends {}>(collectionTag: T[], itemTag: T) => ({ resolve, path }: IContext) => {
+    const collection = resolve.value<T[]>(collectionTag)
+    const item  = resolve.value<T>(itemTag)
+    if (!collection) throw Error(`Collection are not existing under path: ${resolve.path(collectionTag as any as Tag<Card[]>)}`)
+    if (!item) throw Error(`Item are not existing under path: ${resolve.path(itemTag as any as Tag<Card[]>)}`)
+
+    const index = collection.findIndex((v) => v === item)
+    if(index === -1) return path.none()
+
+    return path.some({ index })
+}
+
+const findIndex = <T extends {}>(collectionTag: T[], itemTag: T, paths: { some: any, none: any }) => sequence("find index", [
+    _findIndex(collectionTag, itemTag), {
+        some: paths.some,
+        none: paths.none
+    }
+])
+
+const props = p as unknown as Payload & { index: number }
+
+export default sequence<Payload>([
+    when(props.card.isSolved), {
+        true: [],
+        false: [
+            areExactlyTwoSelected(state.game.cards), {
+                true: [],
+                false: [
+                    findIndex(state.game.cards, props.card, {
+                        none: [],
+                        some: [
+                            set(state.game.cards[props.index].isSelected, true),
+                            processSelectedCards
+                        ]
+                    })
+                ]
+            }
+        ]
+    }
+])
