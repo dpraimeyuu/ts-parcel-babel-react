@@ -8,7 +8,8 @@ export type State = {
     cards: Card[]
     status: GameStatus,
     currentTime: number,
-    points: number
+    points: number,
+    timeLeft: number
 }
 
 export type GameStatus = "NOT_STARTED" | "PLAYING" | "FINISHED"

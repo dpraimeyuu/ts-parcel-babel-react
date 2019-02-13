@@ -4,6 +4,7 @@ import { connect, ConnectedProps } from "@cerebral/react";
 import { state, sequences } from "../app/app.cerebral";
 import { Card } from "app/game/types";
 import { chunk } from "./utils";
+import TimeLeft from "./TimeLeft";
 
 type CardsCountProps = { onChange: typeof sequences.game.initializeGame }
 class CardsCount extends React.Component<CardsCountProps, { count?: number }> {
@@ -32,7 +33,7 @@ const getCardColor = (card: Card) => {
 }
 const Card = ({ onClick, card }: { onClick: any, card: Card }) => (
     <div onClick={() => onClick({ card })} style={{ backgroundColor: getCardColor(card)}}>
-        <article className="mw5 center br3 pa3 pa4-ns ba b--black-10">
+        <article className="mw5 center pa3 pa4-ns ba b--black-10">
         {
             <p className="center black-70" style={{ fontSize: "3em", textAlign: "center", width: cardEdge, height: cardEdge}}>
                 {card && card.isSelected && card.figure}
@@ -71,7 +72,10 @@ const App: React.FunctionComponent<Dependencies & ConnectedProps> = (props) => (
         <div>
             { props.gameStatus !== "PLAYING" && <CardsCount onChange={(payload: { numberOfCards: number }) => props.initialize(payload)}/>}
             {
-                props.gameStatus === "PLAYING" && props.cards && <CardsGrid onClick={props.cardSelected} cards={props.cards.map(c => c)}/>
+                props.gameStatus === "PLAYING" && props.cards && <>
+                    <TimeLeft  />
+                    <CardsGrid onClick={props.cardSelected} cards={props.cards.map(c => c)}/>
+                </>
             }
             {props.gameStatus === "FINISHED" && <span style={{ color: "red" }}>Congratz! You've completed the game!</span> }
         </div>

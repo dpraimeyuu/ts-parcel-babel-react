@@ -8,6 +8,7 @@ export interface ITime {
 export type TimeConfiguration = {
     timeUpdated: string
 }
+
 export const Time = (configuration: TimeConfiguration) => {
     let timeStopper: number | undefined
 
@@ -27,4 +28,5 @@ export const Time = (configuration: TimeConfiguration) => {
 }
 
 export const startTimeFlow = ({ time }: { time: ITime }) => time.start()
+
 export const stopTimeFlow = ({ time }: { time: ITime }) => time.stop()
