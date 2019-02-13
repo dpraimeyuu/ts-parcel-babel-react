@@ -15,7 +15,9 @@ const main: ModuleDefinition<State> = {
     state,
     sequences,
     providers: {
-        time: Provider(Time("game.timeUpdated"))
+        time: Provider(Time({
+            timeUpdated: "game.timeUpdated",
+        }))
     }
 }
 
