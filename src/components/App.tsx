@@ -62,6 +62,7 @@ const CardsGrid = ({ cards, onClick }: { onClick: any, cards: Card[] }) => {
 const dependencies = {
     gameStatus: state.game.status,
     cards: state.game.cards,
+    points: state.game.points,
     initialize: sequences.game.initializeGame,
     cardSelected: sequences.game.cardSelected
 }
@@ -77,7 +78,7 @@ const App: React.FunctionComponent<Dependencies & ConnectedProps> = (props) => (
                     <CardsGrid onClick={props.cardSelected} cards={props.cards.map(c => c)}/>
                 </>
             }
-            { props.gameStatus === "PLAYER_WIN" && <span style={{ color: "green" }}>Congratz! You've completed the game!</span> }
+            { props.gameStatus === "PLAYER_WIN" && <span style={{ color: "green" }}>Congratz! You've completed the game! You got: { props.points } points!</span> }
             { props.gameStatus === "PLAYER_LOSE" && <span style={{ color: "red" }}>Unfortunately time's up, you lost! Try again, maybe this time you'll make it!</span> }
         </div>
     )
