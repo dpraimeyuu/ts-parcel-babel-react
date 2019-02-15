@@ -5,11 +5,7 @@ export type Sequences = {
 };
 
 export type State = {
-    cards: Card[]
-    status: GameStatus
 }
-
-export type GameStatus = "NOT_STARTED" | "PLAYING" | "FINISHED"
 
 export type Card = {
     isSelected: boolean,

@@ -1,6 +1,7 @@
-import initializeGame from "./initializeGame";
-import cardSelected from "./cardSelected";
+const initializeGame = () => { }
+const cardSelected = () => { }
 
 export {
-    initializeGame, cardSelected
+    initializeGame,
+    cardSelected
 }
