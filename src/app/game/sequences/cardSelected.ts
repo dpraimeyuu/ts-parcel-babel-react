@@ -2,43 +2,23 @@ import { IContext as Context, sequence, Tag, IContext } from "cerebral";
 
 import { state, props as p } from "../../app.cerebral";
 import { Card } from "../types";
-import { when, set } from "cerebral/factories";
+import { when, set, wait } from "cerebral/factories";
+import { stopTimeFlow } from "../providers/time";
 
 type Payload = { card: Card }
-
-const processSelectedCards = ({ props, store, get }: Context<Payload>) => {
-    const { card } = props
-
-    const cards: Card[] = get(state.game.cards)
-    
-    const selectedCards = cards.filter((c) => c.isSelected)
-    if(selectedCards.length === 2) {
-        const [first, second] = selectedCards
-        const fstIdx = cards.indexOf(first)
-        const sndIdx = cards.indexOf(second)
-        if(first.figure === second.figure) {
-            setTimeout(() => {
-                store.set(state.game.cards[fstIdx], { ...first, isSelected: false, isSolved: true })
-                store.set(state.game.cards[sndIdx], { ...second, isSelected: false, isSolved: true })
-                if(cards.every((c => c.isSolved))) {
-                    setTimeout(() => store.set(state.game.status, "FINISHED"), 200)
-                }
-            }, 1000)
-        } else {
-            setTimeout(() => {
-                store.set(state.game.cards[fstIdx], { ...first, isSelected: false })
-                store.set(state.game.cards[sndIdx], { ...second, isSelected: false })
-            }, 1000)
-        }    
-    }
-
+const props = p as unknown as Payload & {
+    index: number,
+    selectedCards: [Card, Card],
+    firstCardIndex: number,
+    secondCardIndex: number 
 }
 
 const areExactlyTwoSelected = (cardsTag: Card[]) => ({ resolve, path }: IContext) => {
     const cards = resolve.value<Card[]>(cardsTag)
     if(!cards) throw Error(`Cards are not existing under path: ${resolve.path(cardsTag as any as Tag<Card[]>)}`)
 
-    if (cards.filter((c) => c.isSelected).length === 2) return path.true()
+    const selectedCards = cards.filter((c) => c.isSelected)
+    if (selectedCards.length === 2) return path.true({ selectedCards })
 
     return path.false()
 }
@@ -62,7 +42,45 @@ const findIndex = <T extends {}>(collectionTag: T[], itemTag: T, paths: { some: 
     }
 ])
 
-const props = p as unknown as Payload & { index: number }
+const areCardsEqual = (cardATag: Card, cardBTag: Card, paths: { true: any, false: any }) => sequence("are cards equal?", [
+    when(cardATag, cardBTag, (cardA, cardB) => cardA.figure === cardB.figure), {
+        true: paths.true,
+        false: paths.false
+    }
+]) 
+
+const isGameFinished = (cardsTag: Card[], paths: { true: any, false: any }) => sequence("is game finished?", [
+    when(cardsTag, (cards: Card[]) => cards.every((card) => card.isSolved)), {
+        true: paths.true,
+        false: paths.false
+    }
+])
+
+const processSelectedCards = sequence("process selected cards", [
+    wait(1000), {
+        continue: areCardsEqual(props.selectedCards[0], props.selectedCards[1], {
+            true: [
+                set(state.game.cards[props.firstCardIndex].isSolved, true),
+                set(state.game.cards[props.secondCardIndex].isSolved, true),
+                set(state.game.cards[props.firstCardIndex].isSelected, false),
+                set(state.game.cards[props.secondCardIndex].isSelected, false),
+                wait(200), {
+                    continue: isGameFinished(state.game.cards, {
+                        true: [
+                            set(state.game.status, "FINISHED"),
+                            stopTimeFlow,
+                        ],
+                        false: []
+                    })
+                }
+            ],
+            false: [
+                set(state.game.cards[props.firstCardIndex].isSelected, false),
+                set(state.game.cards[props.secondCardIndex].isSelected, false),
+            ]
+        })
+    }       
+])
 
 export default sequence<Payload>([
     when(props.card.isSolved), {
@@ -75,7 +93,20 @@ export default sequence<Payload>([
                         none: [],
                         some: [
                             set(state.game.cards[props.index].isSelected, true),
-                            processSelectedCards
+                            areExactlyTwoSelected(state.game.cards), {
+                                false: [],
+                                true: [
+                                    findIndex(state.game.cards, props.selectedCards[0], {
+                                        none: [],
+                                        some: set(props.firstCardIndex, props.index)
+                                    }),
+                                    findIndex(state.game.cards, props.selectedCards[1], {
+                                        none: [],
+                                        some: set(props.secondCardIndex, props.index)
+                                    }),
+                                    processSelectedCards
+                                ]
+                            }
                         ]
                     })
                 ]
