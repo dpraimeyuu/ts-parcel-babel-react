@@ -67,7 +67,7 @@ const processSelectedCards = sequence("process selected cards", [
                 wait(200), {
                     continue: isGameFinished(state.game.cards, {
                         true: [
-                            set(state.game.status, "FINISHED"),
+                            set(state.game.status, "PLAYER_WIN"),
                             stopTimeFlow,
                         ],
                         false: []
