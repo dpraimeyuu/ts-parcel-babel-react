@@ -12,7 +12,7 @@ export type State = {
     timeLeft: number
 }
 
-export type GameStatus = "NOT_STARTED" | "PLAYING" | "FINISHED"
+export type GameStatus = "NOT_STARTED" | "PLAYING" | "PLAYER_WIN" | "PLAYER_LOSE"
 
 export type Card = {
     isSelected: boolean,

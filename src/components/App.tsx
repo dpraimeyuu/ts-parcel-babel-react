@@ -77,7 +77,8 @@ const App: React.FunctionComponent<Dependencies & ConnectedProps> = (props) => (
                     <CardsGrid onClick={props.cardSelected} cards={props.cards.map(c => c)}/>
                 </>
             }
-            {props.gameStatus === "FINISHED" && <span style={{ color: "red" }}>Congratz! You've completed the game!</span> }
+            { props.gameStatus === "PLAYER_WIN" && <span style={{ color: "green" }}>Congratz! You've completed the game!</span> }
+            { props.gameStatus === "PLAYER_LOSE" && <span style={{ color: "red" }}>Unfortunately time's up, you lost! Try again, maybe this time you'll make it!</span> }
         </div>
     )
 
