@@ -71,7 +71,7 @@ const App: React.FunctionComponent<Dependencies & ConnectedProps> = (props) => (
         <div>
             { props.gameStatus !== "PLAYING" && <CardsCount onChange={(payload: { numberOfCards: number }) => props.initialize(payload)}/>}
             {
-                props.gameStatus === "PLAYING" && props.cards && <CardsGrid onClick={props.cardSelected} cards={props.cards.map(c => c)}/>
+                props.gameStatus === "PLAYING" && props.cards && <CardsGrid onClick={props.cardSelected} cards={props.cards}/>
             }
             {props.gameStatus === "FINISHED" && <span style={{ color: "red" }}>Congratz! You've completed the game!</span> }
         </div>
